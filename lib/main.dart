@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:war_docs/providers/provider.dart';
 import 'package:war_docs/route_generator.dart';
 import 'package:flutter/services.dart';
 
 void main() {
-  runApp(const warDocs());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (context) => RaceProvider(),
+      ),
+    ],
+    child: const WarDocs(),
+  ));
 }
 
-// ignore: camel_case_types
-class warDocs extends StatelessWidget {
-  const warDocs({super.key});
+class WarDocs extends StatelessWidget {
+  const WarDocs({super.key});
 
   @override
   Widget build(BuildContext context) {

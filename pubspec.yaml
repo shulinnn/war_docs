@@ -40,6 +40,7 @@ dependencies:
   google_fonts: ^6.1.0
   http: ^1.1.0
   json_helpers: ^0.1.5
+  provider: ^6.1.1
 
 dev_dependencies:
   flutter_test:
@@ -70,9 +71,8 @@ flutter:
 
   assets : 
     - assets/bg.jpg
-    - assets/race/icons/
-    - assets/race/icons/spells/
-    - assets/db/
+    - assets/gold_icon.png
+    - assets/lumber_icon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

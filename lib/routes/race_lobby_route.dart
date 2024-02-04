@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:war_docs/layouts/master_drawer.dart';
 import 'package:war_docs/providers/provider.dart';
 import 'package:war_docs/services/api_service.dart';
 import 'package:war_docs/models/race.dart';
 
-class LandingRoute extends StatefulWidget {
-  const LandingRoute({super.key});
+class RaceLobbyRoute extends StatefulWidget {
+  const RaceLobbyRoute({super.key});
 
   @override
-  State createState() => _LandingRouteState();
+  State createState() => _RaceLobbyRouteState();
 }
 
-class _LandingRouteState extends State<LandingRoute> {
-  late Future<List<Race>> raceModel;
-  final _controller = PageController(
-    initialPage: 0,
-  );
+class _RaceLobbyRouteState extends State<RaceLobbyRoute> {
+  late Future<Race> raceModel;
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -23,28 +25,23 @@ class _LandingRouteState extends State<LandingRoute> {
   }
 
   @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
+        drawerEnableOpenDragGesture: false,
+        drawer: const MasterDrawer(),
         floatingActionButton: Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: Navigator.of(context).canPop()
-              ? FloatingActionButton.small(
-                  onPressed: () => {Navigator.of(context).pop()},
-                  backgroundColor: Colors.white,
-                  child: const Icon(
-                    Icons.chevron_left,
-                    color: Colors.black,
-                    size: 24,
-                  ),
-                )
-              : null,
-        ),
+            padding: const EdgeInsets.only(top: 16),
+            child: Builder(
+              builder: (context) => FloatingActionButton.small(
+                onPressed: () => {Scaffold.of(context).openDrawer()},
+                backgroundColor: Colors.white,
+                child: const Icon(
+                  Icons.menu,
+                  color: Colors.black,
+                  size: 24,
+                ),
+              ),
+            )),
         floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
         body: Container(
             decoration: const BoxDecoration(
@@ -55,29 +52,26 @@ class _LandingRouteState extends State<LandingRoute> {
                     opacity: 0.1)),
             alignment: Alignment.center,
             child: FutureBuilder(
-              future: ApiService().getRaces(),
-              builder: (context, snapshot) {
-                if (snapshot.data == null) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                return PageView.builder(
-                    itemBuilder: (BuildContext context, int index) {
+                future: ApiService()
+                    .getRace(Provider.of<RaceProvider>(context).race as int),
+                builder: ((context, snapshot) {
+                  if (snapshot.data == null) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
                   return Column(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Image.network(
-                        ApiService().getImage(snapshot.data?[index].icon),
+                        ApiService().getImage(snapshot.data?.icon),
                         width: MediaQuery.of(context).size.width * 0.6,
                       ),
                       SizedBox(
                         height: MediaQuery.of(context).size.height * 0.020,
                       ),
                       Text(
-                        snapshot.data![index].name.toString(),
+                        snapshot.data!.name.toString(),
                         style: const TextStyle(
                             fontSize: 36,
                             color: Colors.white,
@@ -87,15 +81,14 @@ class _LandingRouteState extends State<LandingRoute> {
                         height: MediaQuery.of(context).size.height * 0.020,
                       ),
                       Image.network(
-                        ApiService()
-                            .getImage(snapshot.data![index].ability!.icon),
+                        ApiService().getImage(snapshot.data!.ability!.icon),
                         width: MediaQuery.of(context).size.width * 0.15,
                       ),
                       SizedBox(
                         height: MediaQuery.of(context).size.height * 0.020,
                       ),
                       Text(
-                        snapshot.data![index].ability!.name.toString(),
+                        snapshot.data!.ability!.name.toString(),
                         style: const TextStyle(
                             fontSize: 24,
                             color: Colors.white,
@@ -107,7 +100,7 @@ class _LandingRouteState extends State<LandingRoute> {
                       Padding(
                         padding: const EdgeInsets.only(left: 16, right: 16),
                         child: Text(
-                          snapshot.data![index].ability!.description.toString(),
+                          snapshot.data!.ability!.description.toString(),
                           textAlign: TextAlign.center,
                           style: const TextStyle(color: Colors.white),
                         ),
@@ -115,25 +108,8 @@ class _LandingRouteState extends State<LandingRoute> {
                       SizedBox(
                         height: MediaQuery.of(context).size.height * 0.030,
                       ),
-                      ElevatedButton(
-                          onPressed: () {
-                            var race = context.read<RaceProvider>();
-                            race.setRace(snapshot.data![index].id);
-                            Navigator.pushNamed(context, "/race_lobby");
-                          },
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue),
-                          child: const Padding(
-                            padding: EdgeInsets.only(left: 64, right: 64),
-                            child: Text(
-                              "Zvolit rasu",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ))
                     ],
                   );
-                });
-              },
-            )));
+                }))));
   }
 }
